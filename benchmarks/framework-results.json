@@ -1,0 +1,35 @@
+{
+  "directory": "/var/folders/x0/rkk2qpg16fl0ccn9dbfcpdfr0000gn/T/agent-stage-apps-nzjyKx",
+  "results": [
+    {
+      "framework": "vue",
+      "build": "passed",
+      "browser": "passed"
+    },
+    {
+      "framework": "angular17",
+      "build": "passed",
+      "browser": "passed"
+    },
+    {
+      "framework": "angular21",
+      "build": "passed",
+      "browser": "passed"
+    },
+    {
+      "framework": "react18",
+      "build": "passed",
+      "browser": "passed"
+    },
+    {
+      "framework": "react19",
+      "build": "passed",
+      "browser": "passed"
+    },
+    {
+      "framework": "vue32",
+      "build": "passed",
+      "browser": "passed"
+    }
+  ]
+}

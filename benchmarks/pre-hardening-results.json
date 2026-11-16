@@ -1,0 +1,136 @@
+{
+  "cycles": {
+    "count": 20,
+    "transactionsPerCycle": 200,
+    "subscribersPerCycle": 10,
+    "beforeBytes": 4703368,
+    "afterBytes": 4770744
+  },
+  "node": "v22.22.1",
+  "platform": "darwin",
+  "arch": "arm64",
+  "results": [
+    {
+      "name": "small capture/propose",
+      "iterations": 20,
+      "medianMs": 0.017542,
+      "p95Ms": 0.1635
+    },
+    {
+      "name": "small preview",
+      "iterations": 30,
+      "medianMs": 0.005083,
+      "p95Ms": 0.00975
+    },
+    {
+      "name": "small decisions",
+      "iterations": 100,
+      "medianMs": 0.000667,
+      "p95Ms": 0.002292
+    },
+    {
+      "name": "small commit",
+      "iterations": 20,
+      "medianMs": 0.040625,
+      "p95Ms": 0.264708
+    },
+    {
+      "name": "small commit only",
+      "iterations": 20,
+      "medianMs": 0.012375,
+      "p95Ms": 0.039041
+    },
+    {
+      "name": "nested capture/propose",
+      "iterations": 20,
+      "medianMs": 8.606792,
+      "p95Ms": 9.95175
+    },
+    {
+      "name": "nested preview",
+      "iterations": 30,
+      "medianMs": 3.150416,
+      "p95Ms": 4.730666
+    },
+    {
+      "name": "nested decisions",
+      "iterations": 100,
+      "medianMs": 0.000375,
+      "p95Ms": 0.000417
+    },
+    {
+      "name": "nested commit",
+      "iterations": 20,
+      "medianMs": 15.452,
+      "p95Ms": 21.682041
+    },
+    {
+      "name": "nested commit only",
+      "iterations": 20,
+      "medianMs": 5.509375,
+      "p95Ms": 7.68875
+    },
+    {
+      "name": "array capture/propose",
+      "iterations": 20,
+      "medianMs": 7.562125,
+      "p95Ms": 9.337709
+    },
+    {
+      "name": "array preview",
+      "iterations": 30,
+      "medianMs": 3.338833,
+      "p95Ms": 3.80525
+    },
+    {
+      "name": "array decisions",
+      "iterations": 100,
+      "medianMs": 0.000458,
+      "p95Ms": 0.00075
+    },
+    {
+      "name": "array commit",
+      "iterations": 20,
+      "medianMs": 16.498583,
+      "p95Ms": 19.705292
+    },
+    {
+      "name": "array commit only",
+      "iterations": 20,
+      "medianMs": 7.27175,
+      "p95Ms": 10.718958
+    },
+    {
+      "name": "1000 independent small transactions",
+      "iterations": 5,
+      "medianMs": 2.372667,
+      "p95Ms": 2.998
+    },
+    {
+      "name": "1000 operations propose/group",
+      "iterations": 5,
+      "medianMs": 44.267833,
+      "p95Ms": 44.737375
+    },
+    {
+      "name": "1000 subscriber notification",
+      "iterations": 100,
+      "medianMs": 0.008292,
+      "p95Ms": 0.038417
+    },
+    {
+      "name": "20000-element state with 1000 operations (single sample)",
+      "iterations": 1,
+      "medianMs": 1493.124416
+    }
+  ],
+  "memory": {
+    "transactions": 3000,
+    "payloadBytes": 10000,
+    "beforeBytes": 4621808,
+    "retainedBytes": 35649024,
+    "afterDisposeBytes": 4700064
+  },
+  "notifications": 103000,
+  "notes": "Rows named commit include capture/propose/approval; commit only rows exclude preparation. Single process; timings are descriptive, not CI thresholds."
+}

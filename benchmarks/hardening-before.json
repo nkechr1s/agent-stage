@@ -1,0 +1,95 @@
+{
+  "target": "/private/tmp/agent-stage-before-hardening/dist/index.js",
+  "node": "v22.22.1",
+  "platform": "darwin",
+  "arch": "arm64",
+  "rows": [
+    {
+      "name": "small proposal",
+      "count": 20,
+      "rejected": 0,
+      "medianMs": 0.007583000000003892,
+      "p95Ms": 0.1819589999999991,
+      "outcome": "executed"
+    },
+    {
+      "name": "small repeated preview",
+      "count": 20,
+      "rejected": 0,
+      "medianMs": 0.002582999999994229,
+      "p95Ms": 0.027792000000005146
+    },
+    {
+      "name": "medium proposal",
+      "count": 20,
+      "rejected": 0,
+      "medianMs": 1.5182499999999948,
+      "p95Ms": 1.9777910000000105,
+      "outcome": "executed"
+    },
+    {
+      "name": "medium repeated preview",
+      "count": 20,
+      "rejected": 0,
+      "medianMs": 1.380625000000009,
+      "p95Ms": 1.563208000000003
+    },
+    {
+      "name": "large array proposal",
+      "count": 20,
+      "rejected": 0,
+      "medianMs": 4.694834000000014,
+      "p95Ms": 8.211749999999995,
+      "outcome": "executed"
+    },
+    {
+      "name": "large array repeated preview",
+      "count": 20,
+      "rejected": 0,
+      "medianMs": 3.3834580000000187,
+      "p95Ms": 5.03287499999999
+    },
+    {
+      "name": "large batch proposal",
+      "count": 20,
+      "rejected": 0,
+      "medianMs": 0.4033329999999751,
+      "p95Ms": 0.7092499999999973,
+      "outcome": "executed"
+    },
+    {
+      "name": "large batch repeated preview",
+      "count": 20,
+      "rejected": 0,
+      "medianMs": 0.2632499999999709,
+      "p95Ms": 0.5142500000000041
+    },
+    {
+      "name": "combined proposal",
+      "count": 5,
+      "rejected": 0,
+      "medianMs": 1659.9652920000008,
+      "p95Ms": 1751.0237500000003,
+      "outcome": "executed"
+    },
+    {
+      "name": "combined repeated preview",
+      "count": 20,
+      "rejected": 0,
+      "medianMs": 1653.5905409999978,
+      "p95Ms": 1876.3905840000007
+    },
+    {
+      "name": "1000 sequential transactions",
+      "count": 10,
+      "rejected": 0,
+      "medianMs": 2.5398329999952693,
+      "p95Ms": 2.809458999996423
+    }
+  ],
+  "memory": {
+    "before": 3738040,
+    "retained": 34783560,
+    "disposed": 3803768
+  }
+}

@@ -1,0 +1,102 @@
+{
+  "name": "agent-stage",
+  "version": "0.1.0",
+  "description": "Framework-agnostic staging of transactional application state changes",
+  "type": "module",
+  "files": [
+    "dist",
+    "src",
+    "README.md",
+    "docs",
+    "PRODUCTION-READINESS.md",
+    "benchmarks/results.json",
+    "benchmarks/framework-results.json",
+    "benchmarks/hardening-before.json",
+    "benchmarks/hardening-after.json"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./react": {
+      "types": "./dist/react/index.d.ts",
+      "import": "./dist/react/index.js"
+    },
+    "./zustand": {
+      "types": "./dist/adapters/zustand.d.ts",
+      "import": "./dist/adapters/zustand.js"
+    },
+    "./vue": {
+      "types": "./dist/vue/index.d.ts",
+      "import": "./dist/vue/index.js"
+    },
+    "./angular": {
+      "types": "./dist/angular/index.d.ts",
+      "import": "./dist/angular/index.js"
+    }
+  },
+  "types": "./dist/index.d.ts",
+  "sideEffects": false,
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:unit": "vitest run tests/core tests/adapters tests/react tests/vue tests/angular tests/security",
+    "test:integration": "vitest run tests/integration tests/compatibility",
+    "example": "tsx examples/basic-transaction.ts",
+    "demo": "vite examples/react-zustand",
+    "demo:build": "vite build examples/react-zustand",
+    "example:vanilla": "tsx examples/run-vanilla.ts",
+    "check:package": "node scripts/check-package-isolation.mjs",
+    "benchmark": "node --expose-gc benchmarks/runtime.mjs",
+    "test:security": "vitest run tests/security",
+    "prepack": "npm run build",
+    "check:frameworks": "node scripts/framework-builds.mjs",
+    "benchmark:hardening": "node --expose-gc benchmarks/hardening.mjs ../dist/index.js benchmarks/hardening-after.json"
+  },
+  "devDependencies": {
+    "@angular/common": "^21.2.26",
+    "@angular/compiler": "^21.2.26",
+    "@angular/core": "^21.2.26",
+    "@angular/platform-browser": "^21.2.26",
+    "@types/node": "^22.0.0",
+    "@types/react": "^18.3.31",
+    "@types/react-dom": "^18.3.7",
+    "@vue/compiler-sfc": "^3.5.45",
+    "jsdom": "^26.1.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "rxjs": "^7.8.2",
+    "tsx": "^4.23.15",
+    "typescript": "~5.9.3",
+    "vite": "^7.3.8",
+    "vitest": "^5.1.0",
+    "vue": "^3.5.45",
+    "zustand": "^5.1.0"
+  },
+  "peerDependencies": {
+    "@angular/core": ">=17 <22",
+    "react": ">=18 <20",
+    "vue": ">=3.2 <4",
+    "zustand": ">=5 <6"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "zustand": {
+      "optional": true
+    },
+    "vue": {
+      "optional": true
+    },
+    "@angular/core": {
+      "optional": true
+    }
+  },
+  "license": "MIT"
+}

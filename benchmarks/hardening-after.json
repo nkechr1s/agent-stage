@@ -1,0 +1,109 @@
+{
+  "target": "../dist/index.js",
+  "node": "v22.22.1",
+  "platform": "darwin",
+  "arch": "arm64",
+  "rows": [
+    {
+      "name": "small proposal",
+      "count": 20,
+      "rejected": 0,
+      "medianMs": 0.021249999999998437,
+      "p95Ms": 0.39879099999999923,
+      "outcome": "executed"
+    },
+    {
+      "name": "small repeated preview",
+      "count": 20,
+      "rejected": 0,
+      "medianMs": 0.002833000000002528,
+      "p95Ms": 0.004417000000000115
+    },
+    {
+      "name": "medium proposal",
+      "count": 20,
+      "rejected": 0,
+      "medianMs": 1.958874999999999,
+      "p95Ms": 3.8159999999999954,
+      "outcome": "executed"
+    },
+    {
+      "name": "medium repeated preview",
+      "count": 20,
+      "rejected": 0,
+      "medianMs": 1.9156249999999915,
+      "p95Ms": 3.0238749999999897
+    },
+    {
+      "name": "large array proposal",
+      "count": 20,
+      "rejected": 0,
+      "medianMs": 5.316041000000013,
+      "p95Ms": 7.5033750000000055,
+      "outcome": "executed"
+    },
+    {
+      "name": "large array repeated preview",
+      "count": 20,
+      "rejected": 0,
+      "medianMs": 3.7670420000000036,
+      "p95Ms": 4.356291999999996
+    },
+    {
+      "name": "large batch proposal",
+      "count": 20,
+      "rejected": 0,
+      "medianMs": 0.4974579999999946,
+      "p95Ms": 0.8120000000000118,
+      "outcome": "executed"
+    },
+    {
+      "name": "large batch repeated preview",
+      "count": 20,
+      "rejected": 0,
+      "medianMs": 0.23908400000004804,
+      "p95Ms": 0.9511669999999981
+    },
+    {
+      "name": "combined proposal",
+      "count": 5,
+      "rejected": 5,
+      "medianMs": 0.003249999999979991,
+      "p95Ms": 0.0038339999999834617,
+      "outcome": "rejected"
+    },
+    {
+      "name": "combined with maxOperations raised (work-unit guard)",
+      "count": 5,
+      "rejected": 5,
+      "medianMs": 0.8489170000000286,
+      "p95Ms": 0.930041000000017
+    },
+    {
+      "name": "alternative: recount base for each admission",
+      "count": 20,
+      "rejected": 0,
+      "medianMs": 1.722750000000019,
+      "p95Ms": 2.2921249999999986
+    },
+    {
+      "name": "alternative: reuse validated capture size",
+      "count": 20,
+      "rejected": 0,
+      "medianMs": 0.0003330000000119071,
+      "p95Ms": 0.0023329999999646134
+    },
+    {
+      "name": "1000 sequential transactions",
+      "count": 10,
+      "rejected": 0,
+      "medianMs": 3.3565000000000396,
+      "p95Ms": 4.006665999999996
+    }
+  ],
+  "memory": {
+    "before": 4965048,
+    "retained": 5562504,
+    "disposed": 5034336
+  }
+}
