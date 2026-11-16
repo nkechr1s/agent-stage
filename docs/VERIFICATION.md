@@ -1,5 +1,9 @@
 # Verification
 
+Current CI/developer tooling command and compatibility evidence: [Developer tooling verification](DEVELOPER-TOOLING-VERIFICATION.md). This does not assign a release-readiness status.
+
+Latest public API contract checks and 155-test result: [Public API hardening verification](PUBLIC-API-HARDENING-VERIFICATION.md).
+
 Latest bounded-history/workload results: [Beta hardening verification](BETA-HARDENING-VERIFICATION.md). Earlier reports below are historical baselines.
 
 Current release decision and evidence: [Production readiness audit](../PRODUCTION-READINESS.md).

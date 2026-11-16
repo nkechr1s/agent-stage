@@ -1,0 +1,75 @@
+name: CI
+on:
+  pull_request:
+  push:
+    branches: [main, master, develop]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+env:
+  HUSKY: '0'
+jobs:
+  node:
+    name: Node ${{ matrix.node }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ['22.22.1', '24.22.3']
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+      - run: npm install --global npm@11.13.0
+      - run: npm ci
+      - run: npm run build
+      - run: npm run typecheck
+      - run: npm run test:unit
+      - run: npm run test:types
+      - run: npm run check:package
+      - if: matrix.node == '22.22.1'
+        run: npm run lint
+      - if: matrix.node == '22.22.1'
+        run: npm run check:hooks
+      - if: matrix.node == '22.22.1'
+        run: npm run test:integration
+      - if: matrix.node == '22.22.1'
+        run: npm run check:package:install
+      - if: matrix.node == '22.22.1'
+        run: npm run demo:build
+      - if: matrix.node == '22.22.1'
+        run: npm run example:vanilla
+      - if: matrix.node == '22.22.1'
+        run: npm run check:integrity
+      - run: git diff --exit-code -- package.json package-lock.json
+  representative-frameworks:
+    name: Representative framework apps
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22.22.1'
+          cache: npm
+      - run: npm install --global npm@11.13.0
+      - run: npm ci
+      - run: npm run check:frameworks -- react18 vue angular21
+        env:
+          FRAMEWORK_RESULTS: framework-results.json
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: representative-framework-results
+          path: framework-results.json
+          if-no-files-found: warn

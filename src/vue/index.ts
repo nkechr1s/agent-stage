@@ -24,12 +24,12 @@ function readId(id: StageId): string | null { return typeof id === 'function' ? 
 
 export function useAgentStage(stage: AgentStage): ComputedRef<Snapshot> {
   const version = versionFor(stage);
-  return computed(() => { version.value; return freeze(stage.capture()); });
+  return computed(() => { void version.value; return freeze(stage.capture()); });
 }
 export function useTransaction(stage: AgentStage, transactionId: StageId): ComputedRef<Transaction | null> {
   const version = versionFor(stage);
   return computed(() => {
-    version.value;
+    void version.value;
     const id = readId(transactionId);
     return id === null ? null : freeze(stage.getTransaction(id));
   });

@@ -3,3 +3,6 @@ dist/
 coverage/
 
 /benchmarks/latest-run.log
+/artifacts/
+/benchmarks/soak-results.json
+.husky/_/

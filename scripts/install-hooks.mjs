@@ -1,0 +1,10 @@
+import { existsSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
+import { resolve } from 'node:path';
+if(process.env.npm_command==='pack')process.exit(0);
+if(process.env.HUSKY==='0'||process.env.CI||process.env.NODE_ENV==='production')process.exit(0);
+if(!existsSync('.git')||!existsSync('.husky/pre-commit'))process.exit(0);
+const top=execFileSync('git',['rev-parse','--show-toplevel'],{encoding:'utf8'}).trim();
+if(resolve(top)!==resolve(process.cwd()))process.exit(0);
+const {default:husky}=await import('husky');
+const error=husky();if(error)throw Error(error);

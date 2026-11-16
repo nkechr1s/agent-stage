@@ -51,7 +51,7 @@ it('disposes exactly once, avoids repeated-version updates and permits independe
   let notify!: () => void;
   vi.spyOn(stage, 'subscribe').mockImplementation(listener => { active++; notify = listener; const off = original(listener); return () => { active--; off(); }; });
   const first = effectScope(); const second = effectScope(); let renders = 0;
-  first.run(() => { const view = useTransaction(stage, tx.id); watchSyncEffect(() => { view.value; renders++; }); useAgentStage(stage); });
+  first.run(() => { const view = useTransaction(stage, tx.id); watchSyncEffect(() => { void view.value; renders++; }); useAgentStage(stage); });
   second.run(() => useAgentStage(stage)); expect(active).toBe(2);
   const before = renders; notify(); expect(renders).toBe(before);
   first.stop(); first.stop(); expect(active).toBe(1);

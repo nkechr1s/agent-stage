@@ -1,6 +1,6 @@
 # Supported runtimes and initial release boundaries
 
-The package is ESM-only. It requires native structuredClone, BigInt, WeakMap, Object.hasOwn and modern ES2022 support. Node 22.22.1 on macOS arm64 and headless desktop Chrome were exercised. The package engine floor remains Node >=22; this is not a claim that every operating system, Node major, browser or edge runtime has been tested. Development tooling requires at least Node 22.12 within the Node 22 line.
+The package is ESM-only. It requires native structuredClone, BigInt, WeakMap, Object.hasOwn and modern ES2022 support. Node 22.22.1 and 24.22.3 on macOS arm64 were exercised. The declared range is now >=22.22.1 <23 || >=24.22.3 <25, with those exact floors pinned in CI. This intentionally narrows the old unbounded >=22 declaration instead of implicitly promising future majors. The full core/unit/security suite, builds, declarations and package imports were run on both floors. Patch releases above those floors in the two named majors are compatibility intent; only the pinned matrix points are actual executed evidence. Other Node majors, operating systems, browsers and edge runtimes are not certified by that statement.
 
 Framework peers remain optional and isolated: React >=18 <20; Zustand >=5 <6; Vue >=3.2 <4; Angular Core >=17 <22. Exact tested versions and compiler/browser evidence are in the release report. Historical Angular 17 and Vue 3.2 compatibility does not endorse deploying upstream packages with known advisories. Prefer maintained patched peers.
 
@@ -14,4 +14,6 @@ Use client-only framework components for these bindings. The pure core can run i
 
 A stage retains at most 50 closed records by default and admits at most 100 open/committing transactions. Closed records are pruned automatically in closure order. Both limits are configurable finite integers. Bound workflow duration and proposal count. Dispose consumers before their stage, and then external adapters. No automatic rebase, persistence, undo/redo, distributed transaction or cancellation of already-started adapter writes is provided.
 
-The initial API is pre-1.0. Treat minor releases as potentially breaking and pin compatible versions. A stable 1.0 requires explicit release policy, CI peer/runtime matrix, lifecycle retention policy for sustained sessions, and resolution of the indeterminate-adapter-outcome API ergonomics.
+The initial API is pre-1.0. Treat minor releases as potentially breaking and pin compatible versions. A stable 1.0 requires explicit release policy, CI peer/runtime matrix, lifecycle retention policy for sustained sessions, and validation of the explicit indeterminate-outcome contract in real host applications.
+
+The maintained tooling/consumer matrix is documented in [CI](CI.md) and [development verification](DEVELOPER-TOOLING-VERIFICATION.md). Framework consumers use exact npm manifests and lockfiles. Older Angular compiler fixtures pin compatible Node type declarations to avoid transitive TypeScript-version skew.

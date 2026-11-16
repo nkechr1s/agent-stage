@@ -1,19 +1,19 @@
 import { checkWorkload, stageLimits, workloadExceeded } from './limits.js';
 import type { AgentStageOptions } from './limits.js';
-import { assertCommitResult } from './result.js';
+import { assertCommitResult, copyCommitResult, adapterErrorMessage } from './result.js';
 import type { StateAdapter } from '../adapters/types.js';
 import { StageError } from './errors.js';
 import { groupChanges } from './group.js';
 import { measureJson, clone, cloneJson } from './json.js';
 import { notify } from './notify.js';
 import { applyPatch, validateOperations } from './patch.js';
-import type { CommitResult, Decision, JsonValue, Operation, Snapshot, Transaction } from './types.js';
+import type { CommitResult, Decision, ReadonlyJsonValue, ReadonlyOperation, Snapshot, Transaction } from './types.js';
 export interface AgentStage {
   getVersion(): number;
   capture(): Snapshot;
-  propose(input: { base: Snapshot; operations: readonly Operation[] }): Transaction;
+  propose(input: { base: Snapshot; operations: readonly ReadonlyOperation[] }): Transaction;
   getTransaction(id: string): Transaction;
-  preview(id: string, mode?: 'all' | 'accepted'): JsonValue;
+  preview(id: string, mode?: 'all' | 'accepted'): ReadonlyJsonValue;
   acceptChange(id: string, changeId: string): void;
   rejectChange(id: string, changeId: string): void;
   commit(id: string): Promise<CommitResult>;
@@ -52,9 +52,9 @@ export function createAgentStage(adapter: StateAdapter, options: AgentStageOptio
   function update(transaction: Transaction): void {
     if (disposed) return;
     const previous = transactions.get(transaction.id);
-    const isClosed = transaction.status === 'committed' || transaction.status === 'rolled-back';
+    const isClosed = transaction.status === 'committed' || transaction.status === 'rolled-back' || transaction.status === 'indeterminate';
     if (!previous) openCount++;
-    if (isClosed && previous && previous.status !== 'committed' && previous.status !== 'rolled-back') {
+    if (isClosed && previous && previous.status !== 'committed' && previous.status !== 'rolled-back' && previous.status !== 'indeterminate') {
       openCount--;
       closed.push(transaction.id);
     }
@@ -67,7 +67,7 @@ export function createAgentStage(adapter: StateAdapter, options: AgentStageOptio
     if (!transaction.changes.some(change => change.id === changeId)) throw new StageError('NOT_FOUND', 'Unknown change');
     update({ ...transaction, changes: transaction.changes.map(change => change.id === changeId ? { ...change, decision } : change) });
   }
-  function accepted(transaction: Transaction): Operation[] {
+  function accepted(transaction: Transaction): ReadonlyOperation[] {
     const indexes = new Set(transaction.changes.filter(change => change.decision === 'accepted').flatMap(change => [...change.operationIndexes]));
     return transaction.operations.filter((_, i) => indexes.has(i));
   }
@@ -114,14 +114,17 @@ export function createAgentStage(adapter: StateAdapter, options: AgentStageOptio
         const response: unknown = await adapter.commit({ expectedRevision: transaction.base.revision, operations: clone(accepted(transaction)) });
         try {
           assertCommitResult(response);
-          result = clone(response);
+          if (response.status === 'conflict' && response.expectedRevision !== transaction.base.revision) throw new Error('Conflict revision does not match request');
+          result = copyCommitResult(response);
         } catch {
-          return { status: 'failed', code: 'INVALID_ADAPTER', message: 'Malformed commit result; host outcome is unknown. Transaction remains locked against retry.' };
+          result = { status: 'indeterminate', code: 'INVALID_ADAPTER', message: 'Malformed commit result; host outcome is unknown. Inspect and reconcile host state independently.' };
         }
       } catch (error) {
-        result = { status: 'failed', code: 'ADAPTER_ERROR', message: error instanceof Error ? error.message : 'Adapter commit failed' };
+        result = { status: 'indeterminate', code: 'ADAPTER_ERROR', message: adapterErrorMessage(error) };
       }
-      update({ ...transaction, status: result.status === 'committed' ? 'committed' : 'open' });
+      update(result.status === 'indeterminate'
+        ? { ...transaction, status: 'indeterminate', commitResult: clone(result) }
+        : { ...transaction, status: result.status === 'committed' ? 'committed' : 'open' });
       return result;
     },
     rollback(id) { update({ ...open(id), status: 'rolled-back' }); },

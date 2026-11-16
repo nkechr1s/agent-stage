@@ -1,7 +1,7 @@
 import { fail } from './errors.js';
 import { assertJson, cloneJson, equal } from './json.js';
 import { isAncestor, parsePointer } from './pointer.js';
-import type { JsonValue, Operation } from './types.js';
+import type { JsonValue, Operation, ReadonlyJsonValue, ReadonlyOperation } from './types.js';
 export function validateOperations(input: unknown): Operation[] {
   if (!Array.isArray(input) || input.length > 1000) fail('Expected at most 1000 operations');
   assertJson(input);
@@ -24,16 +24,18 @@ function index(key: string, length: number, adding = false): number {
   if (!Number.isSafeInteger(n) || n < 0 || n > length || (!adding && n === length)) fail('Array index out of bounds');
   return n;
 }
-export function readPath(root: JsonValue, parts: readonly string[]): JsonValue {
+export function readPath(root: JsonValue, parts: readonly string[]): JsonValue;
+export function readPath(root: ReadonlyJsonValue, parts: readonly string[]): ReadonlyJsonValue;
+export function readPath(root: ReadonlyJsonValue, parts: readonly string[]): ReadonlyJsonValue {
   let current = root;
   for (const key of parts) {
     if (current === null || typeof current !== 'object') fail('Path traverses a scalar');
     if (Array.isArray(current)) current = current[index(key, current.length)]!;
-    else { if (!Object.hasOwn(current, key)) fail('Path does not exist'); current = current[key]!; }
+    else { if (!Object.hasOwn(current, key)) fail('Path does not exist'); current = (current as { readonly [key: string]: ReadonlyJsonValue })[key]!; }
   }
   return current;
 }
-function write(root: JsonValue, parts: string[], op: 'add' | 'remove' | 'replace', value: JsonValue = null): JsonValue {
+function write(root: JsonValue, parts: string[], op: 'add' | 'remove' | 'replace', value: ReadonlyJsonValue = null): JsonValue {
   if (!parts.length) { if (op === 'remove') fail('Root removal is unsupported'); return cloneJson(value); }
   const parent = readPath(root, parts.slice(0, -1));
   const key = parts.at(-1)!;
@@ -49,7 +51,7 @@ function write(root: JsonValue, parts: string[], op: 'add' | 'remove' | 'replace
   }
   return root;
 }
-export function applyOperation(root: JsonValue, operation: Operation): JsonValue {
+export function applyOperation(root: JsonValue, operation: ReadonlyOperation): JsonValue {
   const path = parsePointer(operation.path);
   switch (operation.op) {
     case 'test': if (!equal(readPath(root, path), operation.value)) fail('Test operation failed'); return root;
@@ -67,7 +69,7 @@ export function applyOperation(root: JsonValue, operation: Operation): JsonValue
     }
   }
 }
-export function applyPatch(state: JsonValue, input: readonly Operation[]): JsonValue {
+export function applyPatch(state: ReadonlyJsonValue, input: readonly ReadonlyOperation[]): ReadonlyJsonValue {
   assertJson(state);
   const operations = validateOperations(input);
   let result = cloneJson(state);

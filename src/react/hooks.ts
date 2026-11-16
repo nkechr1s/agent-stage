@@ -7,13 +7,13 @@ import { StageError } from '../core/errors.js';
 /** A stable, detached host snapshot. Also rerenders on transaction notifications. */
 export function useAgentStage(stage: AgentStage): Snapshot {
   const version = useSyncExternalStore(stage.subscribe, stage.getVersion);
-  return useMemo(() => freeze(stage.capture()), [stage, version]);
+  return useMemo(() => { void version; return freeze(stage.capture()); }, [stage, version]);
 }
 
 /** Null supports the period before a proposal exists. Unknown non-null IDs throw. */
 export function useTransaction(stage: AgentStage, transactionId: string | null): Transaction | null {
   const version = useSyncExternalStore(stage.subscribe, stage.getVersion);
-  return useMemo(() => transactionId === null ? null : freeze(stage.getTransaction(transactionId)), [stage, transactionId, version]);
+  return useMemo(() => { void version; return transactionId === null ? null : freeze(stage.getTransaction(transactionId)); }, [stage, transactionId, version]);
 }
 
 /** A logical approval group, which may contain several dependent operations. */

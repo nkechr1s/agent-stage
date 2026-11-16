@@ -1,4 +1,4 @@
-import { assertJson } from './json.js';
+import { assertJson, cloneJson } from './json.js';
 import type { CommitResult } from './types.js';
 function isRecord(value: unknown): value is Record<string, unknown> {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
@@ -18,8 +18,24 @@ export function assertCommitResult(value: unknown): asserts value is CommitResul
     }
   } else if (value.status === 'conflict') {
     if (typeof value.expectedRevision === 'string' && typeof value.actualRevision === 'string') return;
-  } else if (value.status === 'failed') {
+  } else if (value.status === 'failed' || value.status === 'indeterminate') {
     if (typeof value.code === 'string' && typeof value.message === 'string') return;
   }
   throw new Error('Malformed adapter commit result');
+}
+
+/** Normalize envelopes so clone behavior or extra metadata cannot remove a discriminant. */
+export function copyCommitResult(value: CommitResult): CommitResult {
+  switch (value.status) {
+    case 'committed': return { status: value.status, snapshot: { state: cloneJson(value.snapshot.state), revision: value.snapshot.revision } };
+    case 'conflict': return { status: value.status, expectedRevision: value.expectedRevision, actualRevision: value.actualRevision };
+    case 'failed': case 'indeterminate': return { status: value.status, code: value.code, message: value.message };
+  }
+}
+export function adapterErrorMessage(error: unknown): string {
+  try {
+    if (typeof error === 'string') return error;
+    if (error instanceof Error && typeof error.message === 'string') return error.message;
+  } catch { /* Error diagnostics must not obscure the unknown outcome. */ }
+  return 'Adapter threw; host outcome is unknown';
 }

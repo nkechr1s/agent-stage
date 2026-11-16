@@ -13,13 +13,13 @@ const stage = createAgentStage(adapter, {
 ## History lifecycle
 
 - New proposals are open. Pending, accepted and rejected are decisions on logical groups, not transaction statuses. Even an all-rejected proposal remains open until explicit commit or rollback.
-- Open transactions never expire or get pruned automatically. Committing transactions, including malformed-adapter outcomes locked in that status, also remain protected.
-- Successful commit and explicit rollback close a transaction. Ordinary conflict/failure leaves it open.
+- Open transactions never expire or get pruned automatically. Committing transactions remain protected. Indeterminate outcomes are terminal and enter closed history.
+- Successful commit, indeterminate commit and explicit rollback close a transaction. Ordinary conflict/failure leaves it open.
 - Closing appends the ID to a FIFO in **closure order**, regardless of creation order. When the configured closed limit is exceeded, the oldest closed records are deleted before the closure notification runs.
 - Retained closed transactions remain inspectable/previewable. Pruned IDs throw the same `StageError / NOT_FOUND` as unknown IDs. IDs are never reused within a stage, even after pruning; the sequence uses BigInt internally and stays a public string.
 - `maxClosedTransactions: 0` disables closed history. The commit result remains available to the caller even though getTransaction will fail immediately after closure. Framework consumers displaying closed records must handle selection of pruned IDs (for example by clearing selection); bindings retain their documented NOT_FOUND behavior.
 - Closing/pruning causes one normal stage notification, with pruning already visible. There is no separate event schema.
-- The open limit counts open **and committing** transactions. New proposals fail with `OPEN_TRANSACTION_LIMIT_EXCEEDED` at capacity; existing transactions are never removed to make room. Closing frees capacity. Invalid/rejected proposals consume no slot or ID and emit no notification.
+- The open limit counts open **and committing** transactions. Indeterminate outcomes release that capacity and count against closed retention. New proposals fail with `OPEN_TRANSACTION_LIMIT_EXCEEDED` at capacity; existing transactions are never removed to make room. Closing frees capacity. Invalid/rejected proposals consume no slot or ID and emit no notification.
 - Limits are copied at construction. Closed count must be a nonnegative safe integer; open count a positive safe integer. Infinity is intentionally unsupported. Applications can choose larger finite limits.
 
 Deleting a record releases its private base snapshot and operations once no in-flight work references them. Caller-held transaction copies, previews, captures, commit results and logs remain the caller's memory responsibility. A retained capture token keeps its separate private capture context alive through the WeakMap; pruning a transaction does not invalidate captures or prevent their reuse. Dispose clears all history/captures/listeners. Always unmount framework consumers first, then dispose their stage and external adapter.

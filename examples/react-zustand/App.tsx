@@ -43,7 +43,7 @@ function Proposal({ demo, id, revision }: { demo: Demo; id: string; revision: st
   const stale = transaction.base.revision !== revision && transaction.status === 'open';
   async function commit() {
     const result = await demo.stage.commit(id);
-    setMessage(result.status === 'committed' ? 'Committed. The project now includes your accepted changes.' : result.status === 'conflict' ? 'Conflict: the project changed after this proposal. Your edits are safe. Roll back this proposal and generate a new one from the current project.' : result.message);
+    setMessage(result.status === 'committed' ? 'Committed. The project now includes your accepted changes.' : result.status === 'conflict' ? 'Conflict: the project changed after this proposal. Your edits are safe. Roll back this proposal and generate a new one from the current project.' : result.status === 'indeterminate' ? `Outcome unknown: ${result.message}. Inspect and reconcile the committed project before generating a fresh proposal.` : result.message);
   }
   return <>
     <div className="proposal-meta"><span>{id}</span><span className="badge">{transaction.status}</span></div>

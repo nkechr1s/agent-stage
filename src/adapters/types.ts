@@ -1,5 +1,5 @@
-import type { CommitResult, Operation, Snapshot } from '../core/types.js';
-export interface CommitRequest { readonly expectedRevision: string; readonly operations: readonly Operation[] }
+import type { CommitResult, ReadonlyOperation, Snapshot } from '../core/types.js';
+export interface CommitRequest { readonly expectedRevision: string; readonly operations: readonly ReadonlyOperation[] }
 export interface StateAdapter {
   getSnapshot(): Snapshot;
   subscribe(listener: () => void): () => void;

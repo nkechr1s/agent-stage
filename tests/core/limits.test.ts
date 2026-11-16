@@ -35,11 +35,11 @@ it('counts committing transactions against the open limit and never prunes them'
  resolve({status:'committed',snapshot:memory.getSnapshot()});await commit;
  expect(()=>stage.getTransaction(tx.id)).toThrow();expect(empty(stage).status).toBe('open');stage.dispose();
 });
-it('keeps conflicts and malformed outcomes protected and capacity can be freed by rollback',async()=>{
+it('keeps open work protected and closes malformed outcomes into configured history',async()=>{
  const memory=createMemoryAdapter({});const stage=createAgentStage(memory,{maxOpenTransactions:1});
  const tx=empty(stage);expect(()=>empty(stage)).toThrow();stage.rollback(tx.id);expect(empty(stage).status).toBe('open');stage.dispose();
  const broken=createAgentStage({...memory,commit:()=>null as unknown as CommitResult},{maxOpenTransactions:1,maxClosedTransactions:0});
- const pending=empty(broken);expect((await broken.commit(pending.id)).status).toBe('failed');expect(broken.getTransaction(pending.id).status).toBe('committing');expect(()=>empty(broken)).toThrow();broken.dispose();
+ const pending=empty(broken);expect((await broken.commit(pending.id)).status).toBe('indeterminate');expect(()=>broken.getTransaction(pending.id)).toThrow(expect.objectContaining({code:'NOT_FOUND'}));expect(empty(broken).status).toBe('open');broken.dispose();
 });
 it.each([{maxClosedTransactions:-1},{maxClosedTransactions:Infinity},{maxOpenTransactions:0},{maxOpenTransactions:1.5},{workload:{maxOperations:1001}},{workload:{maxWorkUnits:NaN}}] as AgentStageOptions[])('validates limits before subscribing: %j',options=>{
  const adapter=createMemoryAdapter({});const subscribe=vi.spyOn(adapter,'subscribe');expect(()=>createAgentStage(adapter,options)).toThrow(expect.objectContaining({code:'INVALID_INPUT'}));expect(subscribe).not.toHaveBeenCalled();

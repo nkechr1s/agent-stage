@@ -12,7 +12,8 @@
     "benchmarks/results.json",
     "benchmarks/framework-results.json",
     "benchmarks/hardening-before.json",
-    "benchmarks/hardening-after.json"
+    "benchmarks/hardening-after.json",
+    "CONTRIBUTING.md"
   ],
   "exports": {
     ".": {
@@ -39,40 +40,55 @@
   "types": "./dist/index.d.ts",
   "sideEffects": false,
   "engines": {
-    "node": ">=22"
+    "node": ">=22.22.1 <23 || >=24.22.3 <25"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.build.json",
+    "build": "node scripts/build.mjs",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:unit": "vitest run tests/core tests/adapters tests/react tests/vue tests/angular tests/security",
     "test:integration": "vitest run tests/integration tests/compatibility",
-    "example": "tsx examples/basic-transaction.ts",
+    "example": "node --import tsx examples/basic-transaction.ts",
     "demo": "vite examples/react-zustand",
     "demo:build": "vite build examples/react-zustand",
-    "example:vanilla": "tsx examples/run-vanilla.ts",
+    "example:vanilla": "node --import tsx examples/run-vanilla.ts",
     "check:package": "node scripts/check-package-isolation.mjs",
     "benchmark": "node --expose-gc benchmarks/runtime.mjs",
     "test:security": "vitest run tests/security",
     "prepack": "npm run build",
     "check:frameworks": "node scripts/framework-builds.mjs",
-    "benchmark:hardening": "node --expose-gc benchmarks/hardening.mjs ../dist/index.js benchmarks/hardening-after.json"
+    "benchmark:hardening": "node --expose-gc benchmarks/hardening.mjs ../dist/index.js benchmarks/hardening-after.json",
+    "test:types": "tsc -p tsconfig.types.json && tsc -p tsconfig.types-bundler.json",
+    "check:package:install": "node scripts/check-package-isolation.mjs --install",
+    "check:integrity": "node scripts/check-package-integrity.mjs",
+    "validate:release": "npm run lint && npm run build && npm run typecheck && npm run test:types && npm test && npm run check:package:install && npm run check:integrity && npm run demo:build && npm run example:vanilla",
+    "soak": "node --expose-gc scripts/soak.mjs",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "prepare": "node -e \"if(require('node:fs').existsSync('scripts/install-hooks.mjs')) import('./scripts/install-hooks.mjs')\"",
+    "check:hooks": "node scripts/check-hooks.mjs"
   },
   "devDependencies": {
     "@angular/common": "^21.2.26",
     "@angular/compiler": "^21.2.26",
     "@angular/core": "^21.2.26",
     "@angular/platform-browser": "^21.2.26",
+    "@eslint/js": "^10.0.1",
     "@types/node": "^22.0.0",
     "@types/react": "^18.3.31",
     "@types/react-dom": "^18.3.7",
     "@vue/compiler-sfc": "^3.5.45",
+    "eslint": "^10.15.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^16.5.0",
+    "husky": "^9.1.7",
     "jsdom": "^26.1.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "rxjs": "^7.8.2",
     "tsx": "^4.23.15",
     "typescript": "~5.9.3",
+    "typescript-eslint": "^8.73.0",
     "vite": "^7.3.8",
     "vitest": "^5.1.0",
     "vue": "^3.5.45",
@@ -98,5 +114,9 @@
       "optional": true
     }
   },
-  "license": "MIT"
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nkechr1s/agent-stage.git"
+  }
 }

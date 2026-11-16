@@ -35,3 +35,7 @@ MIT license selected. See [production readiness assessment](../PRODUCTION-READIN
 ## Beta hardening
 
 Finite configurable history/open limits and combined synchronous workload admission are implemented. See [bounded workflow contracts](BOUNDED-WORKFLOWS.md) and [measurements/verification](BETA-HARDENING-VERIFICATION.md). Existing per-operation safety validation is preserved. Byte quotas, caller-held object ownership, rate controls and broad production CI remain application/release work.
+
+## Public API hardening
+
+Four explicit commit outcomes and terminal indeterminate history semantics are implemented. DeepReadonly/ReadonlyJsonValue/ReadonlyOperation contracts protect returned nested data while keeping mutable inputs convenient. See [migration and verification](PUBLIC-API-HARDENING.md). This phase adds no release engineering or recovery protocol.

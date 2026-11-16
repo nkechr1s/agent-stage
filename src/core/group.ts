@@ -1,9 +1,9 @@
-import { assertJson, clone } from './json.js';
+import { assertJson, cloneJson } from './json.js';
 import { applyOperation, readPath } from './patch.js';
 import { overlaps, parsePointer } from './pointer.js';
-import type { Change, JsonValue, Operation } from './types.js';
-export function groupChanges(base: JsonValue, operations: readonly Operation[]): Change[] {
-  let state = clone(base);
+import type { Change, ReadonlyJsonValue, ReadonlyOperation } from './types.js';
+export function groupChanges(base: ReadonlyJsonValue, operations: readonly ReadonlyOperation[]): Change[] {
+  let state = cloneJson(base);
   const footprints: string[][][] = [];
   for (const operation of operations) {
     const paths = [parsePointer(operation.path)];

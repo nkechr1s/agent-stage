@@ -1,11 +1,11 @@
 import { StageError } from './errors.js';
 import { measureJson } from './json.js';
 import { parsePointer } from './pointer.js';
-import type { Operation } from './types.js';
+import type { ReadonlyOperation } from './types.js';
 export interface AgentStageOptions {
   /** Retain the most recently closed transactions; 0 disables closed history. Default 50. */
   readonly maxClosedTransactions?: number;
-  /** Includes committing and indeterminate transactions. Default 100. */
+  /** Includes committing transactions; terminal indeterminate outcomes count as closed. Default 100. */
   readonly maxOpenTransactions?: number;
   /** Additional admission limits; fixed JSON safety limits always apply. */
   readonly workload?: {
@@ -38,7 +38,7 @@ export function workloadExceeded(): never {
   throw new StageError('WORKLOAD_LIMIT_EXCEEDED', 'Proposal exceeds the configured synchronous workload budget');
 }
 /** Conservative bound, not a timing prediction. No state mutation or cloning here. */
-export function checkWorkload(baseUnits: number, operations: readonly Operation[], maxUnits: number): void {
+export function checkWorkload(baseUnits: number, operations: readonly ReadonlyOperation[], maxUnits: number): void {
   let documentUnits = baseUnits;
   let work = baseUnits;
   let pathUnits = 0;

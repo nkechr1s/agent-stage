@@ -159,8 +159,8 @@ it('preserves accepted decisions and detached operations after an asynchronous a
   } });
   const tx = stage.propose({ base: stage.capture(), operations: [{ op: 'replace', path: '/a', value: 2 }] });
   stage.acceptChange(tx.id, tx.changes[0]!.id);
-  expect(await stage.commit(tx.id)).toMatchObject({ status: 'failed', code: 'ADAPTER_ERROR' });
-  expect(stage.getTransaction(tx.id)).toMatchObject({ status: 'open', changes: [{ decision: 'accepted' }] });
+  expect(await stage.commit(tx.id)).toMatchObject({ status: 'indeterminate', code: 'ADAPTER_ERROR' });
+  expect(stage.getTransaction(tx.id)).toMatchObject({ status: 'indeterminate', changes: [{ decision: 'accepted' }] });
   expect(stage.preview(tx.id, 'accepted')).toEqual({ a: 2 });
   expect(memory.getSnapshot()).toEqual({ revision: '0', state: { a: 1 } });
 });

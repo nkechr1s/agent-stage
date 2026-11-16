@@ -46,10 +46,10 @@ it('keeps patch failures atomic, including a failing move destination', async ()
 });
 it('rejects throwing or incorrect update callbacks before publishing', async () => {
   const store = createStore(() => ({ project: { n: 1 }, action: () => {} }));
-  for (const update of [() => { throw new Error('update failed'); }, () => ({ project: { n: 99 } })]) {
+  for (const [update, expected] of [[() => { throw new Error('update failed'); }, 'indeterminate'], [() => ({ project: { n: 99 } }), 'failed']] as const) {
     const adapter = createZustandAdapter(store, { select: state => state.project, update });
     const base = adapter.getSnapshot();
-    expect((await adapter.commit({ expectedRevision: base.revision, operations: [{ op: 'replace', path: '/n', value: 2 }] })).status).toBe('failed');
+    expect((await adapter.commit({ expectedRevision: base.revision, operations: [{ op: 'replace', path: '/n', value: 2 }] })).status).toBe(expected);
     expect(adapter.getSnapshot()).toEqual(base); adapter.dispose();
   }
 });
@@ -119,4 +119,22 @@ it('keeps concurrent proposals isolated and honors pending decisions', async () 
   txs.forEach(tx => stage.acceptChange(tx.id, tx.changes[0]!.id));
   expect((await Promise.all(txs.map(tx => stage.commit(tx.id)))).map(r => r.status)).toEqual(['committed', 'conflict']);
   expect(store.getState().project.budget).toBe(200);
+});
+it('reports an unexpected update exception as indeterminate even when it wrote host state',async()=>{
+ const store=createStore(()=>({project:{n:1}}));
+ const adapter=createZustandAdapter(store,{select:s=>s.project,update(){store.setState({project:{n:3}});throw Error('after write');}});
+ const result=await adapter.commit({expectedRevision:adapter.getSnapshot().revision,operations:[{op:'replace',path:'/n',value:2}]});
+ expect(result).toMatchObject({status:'indeterminate',code:'ADAPTER_ERROR'});expect(store.getState().project.n).toBe(3);adapter.dispose();
+});
+it('does not assume a prepared updater was published if a store wrapper throws before publication',async()=>{
+ const store=createStore(()=>({project:{n:1}}));
+ const adapter=createZustandAdapter({...store,setState:((updater:unknown)=>{if(typeof updater==='function')updater(store.getState());throw Error('not published');}) as typeof store.setState},{select:s=>s.project,update:(_s,project)=>({project})});
+ expect((await adapter.commit({expectedRevision:adapter.getSnapshot().revision,operations:[{op:'replace',path:'/n',value:2}]})).status).toBe('indeterminate');
+ expect(store.getState().project.n).toBe(1);adapter.dispose();
+});
+it('reports uncertainty if a store wrapper writes without executing the provided updater',async()=>{
+ const store=createStore(()=>({project:{n:1}}));
+ const adapter=createZustandAdapter({...store,setState:((..._args:unknown[])=>{store.setState({project:{n:3}});}) as typeof store.setState},{select:s=>s.project,update:(_s,project)=>({project})});
+ expect((await adapter.commit({expectedRevision:adapter.getSnapshot().revision,operations:[]})).status).toBe('indeterminate');
+ expect(store.getState().project.n).toBe(3);adapter.dispose();
 });

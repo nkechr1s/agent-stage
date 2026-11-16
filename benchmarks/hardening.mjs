@@ -28,4 +28,4 @@ await sample('1000 sequential transactions',()=>{const stage=createAgentStage(cr
 globalThis.gc?.();const before=process.memoryUsage().heapUsed;const stage=createAgentStage(createMemoryAdapter({payload:'x'.repeat(10000)}));
 for(let i=0;i<3000;i++){const t=stage.propose({base:stage.capture(),operations:[]});stage.rollback(t.id);}
 globalThis.gc?.();const retained=process.memoryUsage().heapUsed;stage.dispose();await new Promise(setImmediate);globalThis.gc?.();const disposed=process.memoryUsage().heapUsed;
-const report={target,node:process.version,platform:process.platform,arch:process.arch,rows,memory:{before,retained,disposed}};console.log(JSON.stringify(report,null,2));if(process.argv[3])writeFileSync(process.argv[3],JSON.stringify(report,null,2)+'\n');
+const report={target,node:process.version,platform:process.platform,arch:process.arch,rows,memory:{before,retained,disposed}};console.log(JSON.stringify(report,null,2));if(process.argv[3])writeFileSync(process.env.HARDENING_RESULTS || process.argv[3],JSON.stringify(report,null,2)+'\n');

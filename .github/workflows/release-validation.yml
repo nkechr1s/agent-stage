@@ -1,0 +1,29 @@
+name: Release validation (no publishing)
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+env:
+  HUSKY: '0'
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22.22.1'
+          cache: npm
+      - run: npm install --global npm@11.13.0
+      - run: npm ci
+      - run: npm run validate:release
+      - name: Require an explicit beta version for distribution candidate
+        run: node -e 'const {version}=JSON.parse(require("fs").readFileSync("package.json")); if(!/^\d+\.\d+\.\d+-beta\.\d+$/.test(version)) throw Error("Release candidate must use an explicit -beta.N version; current version remains unreleased")'
+      - run: mkdir -p artifacts && npm pack --pack-destination artifacts
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: validated-beta-candidate
+          path: artifacts/*.tgz

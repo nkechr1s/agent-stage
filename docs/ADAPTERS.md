@@ -7,7 +7,7 @@ Implement the exported `StateAdapter` with `getSnapshot`, `subscribe` and `commi
 3. In one atomic boundary, compare expectedRevision against currentRevision, apply all operations to a detached candidate, validate the candidate, then publish it. `applyPatch` implements validation/detached patch execution; it does not provide a lock or compare-and-swap.
 4. A revision mismatch returns `conflict` with both revisions and changes nothing. An invalid patch/validation failure returns `failed` and changes nothing.
 5. Return a `committed` snapshot representing the state/revision published by that operation. A later reentrant host write can make this snapshot older than the current host by return time; it must not be overwritten to make the return appear current.
-6. Observer failures after publication must not be reported as a failed commit. Adapters must never throw after applying a write. Network timeouts after an unknown server outcome require an idempotency/reconciliation protocol beyond this API.
+6. Observer failures after publication must not be reported as a failed commit. An unexpected throw (before or after a write) is conservatively indeterminate; return failed only for a known no-write failure. Return indeterminate explicitly when publication cannot be established. Network timeouts after an unknown server outcome require an idempotency/reconciliation protocol beyond this API.
 7. Keep the adapter alive while stages depend on it. Unmount consumers, dispose stages, and finally dispose an application-owned adapter. MemoryAdapter has no external resource to dispose; ZustandAdapter does.
 
 Use the memory adapter as the local reference and the Zustand adapter as the synchronous host-store example. Run tests for stale revisions, concurrent requests, invalid later operations after valid earlier operations, external ABA edits, snapshot isolation, reentrancy, and cleanup. Never replace real atomic host enforcement with a core-side preflight check.
@@ -15,3 +15,5 @@ Use the memory adapter as the local reference and the Zustand adapter as the syn
 The selected JSON contract cannot express Date, Map, Set, undefined or class instances. Select a data slice and preserve unrelated host actions. TypeScript generics alone cannot ensure that an AI patch preserves your domain schema; validate candidates explicitly.
 
 See [integration contracts](INTEGRATIONS.md) for Zustand middleware limits and [security model](SECURITY.md) for trusted-code assumptions.
+
+Successful snapshots must be valid readonly JSON data with a string revision. Invalid results are terminal indeterminate outcomes, not no-write failures. See [public outcome contract](PUBLIC-API-HARDENING.md).

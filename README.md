@@ -17,7 +17,7 @@ The initial implementation supports capture → propose → inspect/preview → 
 
 Every change must be explicitly accepted or rejected before commit; pending changes block commit without changing host state. Only JSON-compatible trees are supported. Optional React hooks, Vue composables, Angular signals and a Zustand slice adapter are available through separate entry points. Persistence, automatic rebase, undo/redo, and AI clients are not included. The package is ESM-only.
 
-Development is verified with Node 22.22.1; the test tooling requires Node 22.12+ on the Node 22 line. Runtime code has no dependencies.
+Development is verified with Node 22.22.1 and 24.22.3. The declared range is >=22.22.1 <23 || >=24.22.3 <25; CI pins the two tested floors. Runtime code has no dependencies.
 
 - `src/core/`: public contracts, transaction lifecycle, JSON and patch validation, pointer utilities and approval grouping.
 - `src/adapters/`: host adapter contract and atomic in-memory implementation.
@@ -59,3 +59,13 @@ Verification from a checkout: `npm test`, `npm run test:security`, `npm run buil
 `createAgentStage(adapter, { maxClosedTransactions: 50, maxOpenTransactions: 100, workload: { maxOperations: 200, maxWorkUnits: 250_000 } })` shows the defaults. Set closed retention to zero to discard closed records immediately. Open/committing transactions are protected; capacity rejects new proposals. Pruned IDs return NOT_FOUND. These finite defaults are a deliberate beta behavior change.
 
 See [history and workload contracts](docs/BOUNDED-WORKFLOWS.md) and [before/after measurements](docs/BETA-HARDENING-VERIFICATION.md). Run `npm run build && npm run benchmark:hardening` to reproduce current measurements. Large combined workloads are rejected by admission; the library does not promise universal latency guarantees.
+
+## Public outcome and readonly contracts
+
+Commit returns committed, conflict, failed, or indeterminate. Unexpected adapter exceptions are indeterminate and terminal, never assumed to mean no mutation. Inspect/reconcile the real host independently before creating a new proposal; do not automatically retry. Returned state, operation values, previews and commit snapshots are deeply readonly in TypeScript; mutable proposal construction remains supported. See [migration, error codes and API details](docs/PUBLIC-API-HARDENING.md). Run `npm run test:types` for NodeNext and Bundler type-contract checks.
+
+## Development automation
+
+Use `npm ci`, `npm run lint`, `npm run test:types` and `npm test`. Husky runs the same lint check before commits; `npm run check:hooks` verifies it without creating a commit. See [CONTRIBUTING](CONTRIBUTING.md), [CI and compatibility automation](docs/CI.md), and [future beta release checklist](docs/RELEASING.md). The manual release workflow validates packages only; it does not publish. Version remains unreleased 0.1.0 and a future approved release must use an explicit -beta.N version/channel. No readiness decision is implied by this tooling.
+
+Tooling verification and exact framework/advisory results are recorded in [developer tooling verification](docs/DEVELOPER-TOOLING-VERIFICATION.md). The workflows have been checked locally; hosted status badges will only be added after actual GitHub runs exist.

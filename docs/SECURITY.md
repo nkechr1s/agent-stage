@@ -23,7 +23,7 @@ Observer exceptions are isolated, but recursively mutating subscribers can creat
 
 ## Adapter outcomes
 
-An adapter returning `failed` or `conflict`, or throwing, promises it did not publish. A malformed returned result violates the contract: the core returns `failed / INVALID_ADAPTER` and keeps the transaction locked in `committing` to prevent a duplicate write. Inspect the real host and fix the adapter; discard/dispose that stage when safe. This is an indeterminate outcome, not proof of rollback. No automatic retry is safe after an ambiguous remote write. The library cannot repair a malicious or non-atomic adapter.
+An adapter returning failed or conflict promises this commit did not publish. Unexpected exceptions and malformed results instead produce a terminal indeterminate result and transaction status. The stage stores detached code/message diagnostics, releases open capacity and applies normal closed-history retention. Retry, decisions and rollback are blocked. Inspect and reconcile the real host independently before proposing again; the engine cannot determine or undo an unknown remote outcome. See [outcome contract](PUBLIC-API-HARDENING.md).
 
 ## Findings from the release audit
 

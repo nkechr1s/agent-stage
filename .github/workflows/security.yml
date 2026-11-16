@@ -1,0 +1,45 @@
+name: Dependency security
+on:
+  pull_request:
+  push:
+    branches: [main, master, develop]
+  schedule:
+    - cron: '11 4 * * 2'
+  workflow_dispatch:
+permissions:
+  contents: read
+env:
+  HUSKY: '0'
+jobs:
+  audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22.22.1'
+          cache: npm
+      - run: npm install --global npm@11.13.0
+      - run: npm ci --ignore-scripts
+      - run: npm audit --audit-level=high
+      - if: github.event_name != 'pull_request'
+        run: node scripts/audit-compatibility.mjs
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always() && github.event_name != 'pull_request'
+        with:
+          name: compatibility-advisories
+          path: artifacts/compatibility-audit.json
+          if-no-files-found: warn
+  dependency-review:
+    if: github.event_name == 'pull_request' && github.event.repository.private == false
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/dependency-review-action@2031cfc080254a8a887f58cffee85186f0e49e48 # v4.9.0
+        with:
+          fail-on-severity: high

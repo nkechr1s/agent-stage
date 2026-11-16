@@ -74,7 +74,7 @@ describe('transaction lifecycle', () => {
     expect(stage.getTransaction(transaction.id).status).toBe('open');
     const throwing = createAgentStage({ ...memory, commit() { throw new Error('offline'); } });
     const tx = throwing.propose({ base: throwing.capture(), operations: [] });
-    expect(await throwing.commit(tx.id)).toEqual({ status: 'failed', code: 'ADAPTER_ERROR', message: 'offline' });
+    expect(await throwing.commit(tx.id)).toEqual({ status: 'indeterminate', code: 'ADAPTER_ERROR', message: 'offline' });
   });
 });
 describe('atomic logical grouping', () => {

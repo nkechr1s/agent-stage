@@ -1,0 +1,12 @@
+{
+  "name": "agent-stage-consumer-vue32",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "playwright": "1.56.1",
+    "vite": "7.3.8",
+    "typescript": "5.9.3",
+    "vue": "3.2.47",
+    "@vitejs/plugin-vue": "6.0.2"
+  }
+}

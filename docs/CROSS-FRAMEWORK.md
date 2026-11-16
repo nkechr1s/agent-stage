@@ -105,3 +105,5 @@ Angular CLI/AOT compilation across historical versions and SSR/hydration have no
 Lifecycle behavior follows the official [Vue scope disposal API](https://vuejs.org/api/reactivity-advanced.html#onscopedispose) and [Angular DestroyRef API](https://angular.dev/api/core/DestroyRef).
 
 The release audit corrected Angular subscription sharing: one physical subscription per stage fans out to consumers individually registered with DestroyRef; destroying one consumer does not keep it reactive through another context.
+
+All returned state/operation/preview types are recursively readonly. An indeterminate transaction is terminal, inspectable while retained, and cannot be retried or rolled back. See [public API contracts](PUBLIC-API-HARDENING.md).

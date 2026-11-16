@@ -5,8 +5,8 @@ it.each([null, {}, {status:'wat'}, {status:'committed',snapshot:null}])('handles
  const memory=createMemoryAdapter({n:1});
  const stage=createAgentStage({...memory,commit:()=>result as unknown as CommitResult});
  const tx=stage.propose({base:stage.capture(),operations:[]});
- await expect(stage.commit(tx.id)).resolves.toMatchObject({status:'failed',code:'INVALID_ADAPTER'});
- expect(stage.getTransaction(tx.id).status).toBe('committing');
+ await expect(stage.commit(tx.id)).resolves.toMatchObject({status:'indeterminate',code:'INVALID_ADAPTER'});
+ expect(stage.getTransaction(tx.id).status).toBe('indeterminate');
  await expect(stage.commit(tx.id)).rejects.toThrow();stage.dispose();
 });
 it('rejects forged metadata without changing another transaction',()=>{

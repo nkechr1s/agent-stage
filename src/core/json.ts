@@ -1,5 +1,5 @@
 import { fail } from './errors.js';
-import type { JsonValue } from './types.js';
+import type { JsonValue, ReadonlyJsonValue } from './types.js';
 export const unsafeKey = (key: string): boolean => ['__proto__', 'prototype', 'constructor'].includes(key);
 export function measureJson(value: unknown): { nodes: number; characters: number; units: number } {
   const ancestors = new Set<object>();
@@ -35,13 +35,13 @@ export function measureJson(value: unknown): { nodes: number; characters: number
 export function assertJson(value: unknown): asserts value is JsonValue { measureJson(value); }
 // JSON paths are independent even when JavaScript inputs share object references.
 // Call only after assertJson has bounded and validated the input.
-export function cloneJson(value: JsonValue): JsonValue {
+export function cloneJson(value: ReadonlyJsonValue): JsonValue {
   if (value === null || typeof value !== 'object') return value;
   if (Array.isArray(value)) return value.map(cloneJson);
   return Object.fromEntries(Object.entries(value).map(([key, child]) => [key, cloneJson(child)]));
 }
 export function clone<T>(value: T): T { return structuredClone(value); }
-export function equal(a: JsonValue, b: JsonValue): boolean {
+export function equal(a: ReadonlyJsonValue, b: ReadonlyJsonValue): boolean {
   if (a === b) return true;
   if (typeof a !== 'object' || a === null || typeof b !== 'object' || b === null || Array.isArray(a) !== Array.isArray(b)) return false;
   const keys = Object.keys(a);

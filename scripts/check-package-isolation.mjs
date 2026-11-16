@@ -1,7 +1,7 @@
 import ts from 'typescript';
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { mkdtempSync, mkdirSync, readFileSync, writeFileSync, symlinkSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, readFileSync, writeFileSync, symlinkSync, existsSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -46,12 +46,13 @@ for (const example of examples) {
     const dependencies = { 'agent-stage': 'file:' + join(temporary, pack.filename) };
     for (const peer of example.peers) dependencies[peer] = JSON.parse(readFileSync(join(repository, 'node_modules', peer, 'package.json'), 'utf8')).version;
     writeFileSync(join(consumer, 'package.json'), JSON.stringify({ private: true, type: 'module', dependencies }));
-    execFileSync('npm', ['install', '--omit=dev', '--ignore-scripts', '--no-audit', '--fetch-retries=0', '--fetch-timeout=30000', '--cache', join(temporary, 'cache')], { cwd: consumer, stdio: 'inherit' });
+    execFileSync('npm', ['install', '--omit=dev', '--no-audit', '--fetch-retries=0', '--fetch-timeout=30000', '--cache', join(temporary, 'cache')], { cwd: consumer, stdio: 'inherit' });
   }
   for (const peer of process.argv.includes('--install') ? [] : example.peers) {
     const target = join(modules, peer); mkdirSync(dirname(target), { recursive: true });
     symlinkSync(join(repository, 'node_modules', peer), target, 'dir');
   }
+  if (process.argv.includes('--install')) assert(!existsSync(join(modules, 'husky')), 'Package consumers must not install Husky');
   const packageRoot = join(modules, 'agent-stage');
   const metadata = JSON.parse(readFileSync(join(packageRoot, 'package.json'), 'utf8'));
   const visited = new Set(); const stack = new Set();
@@ -73,7 +74,17 @@ for (const example of examples) {
   inspect(join(packageRoot, metadata.exports[example.entry].import));
   inspect(join(packageRoot, metadata.exports[example.entry].types));
   writeFileSync(join(consumer, 'package.json'), '{"type":"module"}');
-  writeFileSync(join(consumer, 'consumer.ts'), example.code);
+  const typeChecks = `
+function publicReadonlyChecks(snapshot: import('agent-stage').Snapshot, typed: import('agent-stage').DeepReadonly<{items:{name:string}[]}>) {
+  // @ts-expect-error returned snapshot roots are readonly
+  snapshot.state = null;
+  // @ts-expect-error nested arrays and properties stay readonly
+  typed.items[0]!.name = 'changed';
+  // @ts-expect-error array mutation is forbidden
+  typed.items.push({name:'changed'});
+}
+`;
+  writeFileSync(join(consumer, 'consumer.ts'), example.code + typeChecks);
   execFileSync(join(repository, 'node_modules/.bin/tsc'), ['--strict', '--noUncheckedIndexedAccess', '--target', 'es2022', '--module', 'nodenext', 'consumer.ts'], { cwd: consumer, stdio: 'pipe' });
   execFileSync(join(repository, 'node_modules/.bin/tsc'), ['--strict', '--noEmit', '--target', 'es2022', '--module', 'esnext', '--moduleResolution', 'bundler', 'consumer.ts'], { cwd: consumer, stdio: 'pipe' });
   execFileSync(process.execPath, ['consumer.js'], { cwd: consumer, stdio: 'pipe' });

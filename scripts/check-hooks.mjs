@@ -1,0 +1,26 @@
+import assert from 'node:assert/strict';
+import { execFileSync, spawnSync } from 'node:child_process';
+import { mkdtempSync, mkdirSync, copyFileSync, writeFileSync, symlinkSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+const quote=value=>"'"+value.replaceAll("'","'\\''")+"'";
+const root=mkdtempSync(join(tmpdir(),'agent-stage-hooks-'));const repo=process.cwd();
+mkdirSync(join(root,'scripts'));mkdirSync(join(root,'.husky'));
+copyFileSync('scripts/install-hooks.mjs',join(root,'scripts/install-hooks.mjs'));copyFileSync('.husky/pre-commit',join(root,'.husky/pre-commit'));symlinkSync(join(repo,'node_modules'),join(root,'node_modules'),'dir');
+execFileSync('git',['init','--quiet'],{cwd:root});
+const env={...process.env,CI:'',HUSKY:'',NODE_ENV:'development',HUSKY_SKIP_HOOKS:''};
+execFileSync(process.execPath,['scripts/install-hooks.mjs'],{cwd:root,env});
+assert.equal(execFileSync('git',['config','--get','core.hooksPath'],{cwd:root,encoding:'utf8'}).trim(),'.husky/_');
+// Execute the real generated shim with real npm scripts; no commit is created.
+writeFileSync(join(root,'package.json'),JSON.stringify({scripts:{lint:'node -e "process.exit(7)"'}}));
+assert.equal(spawnSync('sh',['.husky/_/pre-commit'],{cwd:root,env}).status,7);
+writeFileSync(join(root,'package.json'),JSON.stringify({scripts:{lint:'node -e "process.exit(0)"'}}));
+assert.equal(spawnSync('sh',['.husky/_/pre-commit'],{cwd:root,env}).status,0);
+writeFileSync(join(root,'package.json'),JSON.stringify({scripts:{lint:`node ${quote(join(repo,'node_modules/eslint/bin/eslint.js'))} . --config ${quote(join(repo,'eslint.config.mjs'))}`}}));
+writeFileSync(join(root,'fixture.ts'),'const unused = 1;\n');
+assert.equal(spawnSync('sh',['.husky/_/pre-commit'],{cwd:root,env}).status,1,'Actual ESLint failure must reject the hook');
+writeFileSync(join(root,'fixture.ts'),'export const valid = 1;\n');
+assert.equal(spawnSync('sh',['.husky/_/pre-commit'],{cwd:root,env}).status,0,'Actual ESLint success must pass the hook');
+const plain=mkdtempSync(join(tmpdir(),'agent-stage-no-git-'));assert.equal(spawnSync(process.execPath,[join(repo,'scripts/install-hooks.mjs')],{cwd:plain,env}).status,0);
+assert.equal(spawnSync(process.execPath,[join(repo,'scripts/install-hooks.mjs')],{cwd:plain,env:{...env,CI:'true'}}).status,0);
+console.log('Husky install, real shim failure/success propagation, CI and non-Git skips passed; no commit created.');

@@ -29,7 +29,7 @@ All callbacks must be pure and synchronous. Use immutable Zustand updates: repla
 
 The adapter tracks a reference to the host's immutable slice, not a second authoritative store. Deep JSON equality suppresses revisions for unrelated changes and equivalent replacement values. A selected-value change advances an adapter-scoped monotonic revision, including changes away from and back to an earlier value. No customizable equality is exposed: ignoring selected fields would weaken conflict detection. Revision IDs are local runtime identifiers, not persistence or distributed concurrency tokens.
 
-Expected revision checking, detached patch application, candidate validation and publication run within synchronous `setState`. A failed patch or pure updater leaves the store unchanged. An observer throwing after an adapter commit publishes cannot turn that committed result into a failure. External Zustand subscribers should not throw: vanilla Zustand can stop delivery before later observers see an external change, particularly an intermediate state in an ABA sequence. The adapter resynchronizes with the current host on reads/commits but cannot reconstruct missed historical notifications.
+Expected revision checking, detached patch application, candidate validation and publication run within synchronous `setState`. A rejected patch or candidate leaves the store unchanged under the pure-callback contract; an unexpected callback exception is indeterminate. An observer exception is still committed when publication of the exact prepared state can be confirmed; otherwise the adapter reports indeterminate. External Zustand subscribers should not throw: vanilla Zustand can stop delivery before later observers see an external change, particularly an intermediate state in an ABA sequence. The adapter resynchronizes with the current host on reads/commits but cannot reconstruct missed historical notifications.
 
 JSON validity is not domain-schema validity. Generic slice types do not validate an AI patch at runtime. Supply `validate: (next: JsonValue) => boolean` when a patch must preserve a narrower schema (required fields, allowed values, etc.). This check runs before `update` and before publication; the demo includes a project validator. Selectors and validators must not mutate their arguments.
 
@@ -80,3 +80,5 @@ The demo lives in `examples/react-zustand`. It uses actual public integration en
 The executable DOM integration test drives this complete workflow through the actual React UI and Zustand actions.
 
 The React subscription contract follows the official [useSyncExternalStore reference](https://react.dev/reference/react/useSyncExternalStore). Zustand publication ordering was checked against the installed `zustand/vanilla` implementation.
+
+Snapshot and hook return types are now recursively readonly. See [public API migration](PUBLIC-API-HARDENING.md) for the indeterminate outcome, terminal lifecycle and validator input changes.
