@@ -1,5 +1,7 @@
 # CI and maintenance automation
 
+The subsequent [picomatch investigation](PICOMATCH-INVESTIGATION.md) records current upstream status and the independent root/fixture audit reporting added in Prompt 12. Security acceptance remains blocked.
+
 Local syntax/semantic validation uses actionlint. Baseline hosted CI/security evidence and the public repository's protection status are recorded in the [final audit](FINAL-RELEASE-AUDIT.md). Subsequent [security-hardening changes](SECURITY-REMEDIATION.md) have been verified locally but not pushed or executed on GitHub. No status badge implies that those uncommitted changes passed hosted CI.
 
 ## Pull requests and main branches

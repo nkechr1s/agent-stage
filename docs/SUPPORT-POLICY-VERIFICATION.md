@@ -1,5 +1,7 @@
 # Support-policy implementation verification
 
+The subsequent [picomatch investigation](PICOMATCH-INVESTIGATION.md) records current upstream status and the independent root/fixture audit reporting added in Prompt 12. Security acceptance remains blocked.
+
 Date: 2026-11-17. The approved contract and legacy retirement are implemented. **Security acceptance is blocked**, because a fresh advisory now affects root and every supported fixture. This report records actual results, not a readiness verdict.
 
 ## New upstream blocker

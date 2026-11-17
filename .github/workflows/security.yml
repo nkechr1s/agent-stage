@@ -24,13 +24,19 @@ jobs:
           cache: npm
       - run: npm install --global npm@11.13.0
       - run: npm ci --ignore-scripts
-      - run: npm audit --audit-level=high
-      - run: node scripts/audit-compatibility.mjs
+      - name: Root audit and complete JSON report
+        if: always()
+        run: node scripts/audit-compatibility.mjs --root
+      - name: Independent supported fixture audits
+        if: always()
+        run: node scripts/audit-compatibility.mjs
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: always()
         with:
-          name: compatibility-advisories
-          path: artifacts/compatibility-audit.json
+          name: root-and-compatibility-advisories
+          path: |
+            artifacts/root-audit.json
+            artifacts/compatibility-audit.json
           if-no-files-found: warn
   dependency-review:
     if: github.event_name == 'pull_request' && github.event.repository.private == false

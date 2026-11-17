@@ -57,3 +57,29 @@ it('allows Moderate and Low findings while retaining the full report', () => {
     expect(JSON.parse(readFileSync(join(root, 'artifacts/compatibility-audit.json'), 'utf8'))).toEqual([{ consumer: 'angular20', audit }]);
   });
 });
+
+it('runs later fixture audits and saves diagnostics after an earlier transport failure', () => {
+  const root = mkdtempSync(join(tmpdir(), 'agent-stage-audit-independent-'));
+  try {
+    for (const name of ['angular20', 'angular21']) mkdirSync(join(root, 'scripts/compatibility', name), { recursive: true });
+    mkdirSync(join(root, 'bin'));
+    writeFileSync(join(root, 'bin/npm'), '#!/usr/bin/env node\nif(process.argv.at(-1).endsWith("angular20")){process.stdout.write("not-json");process.exit(1)}process.stdout.write(process.env.FIXTURE_AUDIT);\n', { mode: 0o755 });
+    const result = spawnSync(process.execPath, [script], { cwd: root, encoding: 'utf8', env: { ...process.env, PATH: join(root, 'bin') + delimiter + process.env.PATH, FIXTURE_AUDIT: JSON.stringify(report(0, 0)) } });
+    expect(result.status).toBe(1);
+    const saved = JSON.parse(readFileSync(join(root, 'artifacts/compatibility-audit.json'), 'utf8'));
+    expect(saved).toHaveLength(2);
+    expect(saved[0].stdout).toBe('not-json');
+    expect(saved[1]).toEqual({ consumer: 'angular21', audit: report(0, 0) });
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+it('root mode preserves High findings and fails independently of fixture discovery', () => {
+  const root = mkdtempSync(join(tmpdir(), 'agent-stage-audit-root-'));
+  try {
+    mkdirSync(join(root, 'bin'));
+    writeFileSync(join(root, 'bin/npm'), '#!/usr/bin/env node\nprocess.stdout.write(process.env.FIXTURE_AUDIT);process.exit(1);\n', { mode: 0o755 });
+    const result = spawnSync(process.execPath, [script, '--root'], { cwd: root, encoding: 'utf8', env: { ...process.env, PATH: join(root, 'bin') + delimiter + process.env.PATH, FIXTURE_AUDIT: JSON.stringify(report(0)) } });
+    expect(result.status).toBe(1);
+    expect(JSON.parse(readFileSync(join(root, 'artifacts/root-audit.json'), 'utf8'))).toEqual([{ consumer: 'root', audit: report(0) }]);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
