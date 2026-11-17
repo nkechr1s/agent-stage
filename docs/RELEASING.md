@@ -2,6 +2,8 @@
 
 Version remains **0.1.0**, an unreleased development version. This tooling phase does not approve distribution. Before the first release, obtain a separate final audit and explicit release approval. The proposed migration is **0.1.0-beta.0** on the npm **beta** dist-tag, not latest. Do not use npm version's default Git tagging behavior; an approved version-only update can use `npm version 0.1.0-beta.0 --no-git-tag-version` and must include package-lock.json. No version bump or tag was performed here.
 
+The [2026-11-17 final gate audit](FINAL-RELEASE-AUDIT.md) returned **NOT READY**. Registry inspection found `agent-stage` already registered at `0.2.20`; publishing authority was not demonstrated. The proposed version above is conditional on an approved namespace and version plan, not permission to publish over an existing package. The now-public repository also needs enforced required checks on `master`. Resolve the audit's owner actions before selecting a release candidate; see the [historical fixture advisory assessment](FINAL-RELEASE-ADVISORIES.md) for residual compatibility-toolchain risks.
+
 ## Checklist
 
 1. Verify repository/package ownership and registry name availability with the owner. Choose the approved exact commit and prerelease version; preserve public API migration notes.

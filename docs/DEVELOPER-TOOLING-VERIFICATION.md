@@ -1,5 +1,7 @@
 # CI, release engineering and developer tooling verification
 
+Historical tooling-phase snapshot: later [release-gate verification](FINAL-RELEASE-AUDIT.md) and [security remediation](SECURITY-REMEDIATION.md) supersede the hosted-verification status, fixture counts and report-only audit behavior recorded below.
+
 Date: 2026-11-17. No readiness verdict is assigned by this tooling phase. The library remains unreleased 0.1.0; a final audit and explicit release approval are still required.
 
 ## Repository audit and implementation

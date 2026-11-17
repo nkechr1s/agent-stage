@@ -19,6 +19,9 @@ for(const framework of (process.argv.slice(2).length ? process.argv.slice(2) : [
  execFileSync('npm',['ci','--ignore-scripts','--no-audit','--fetch-retries=0','--fetch-timeout=30000'],{cwd:dir,stdio:'inherit'});
  mkdirSync(join(dir,'node_modules/agent-stage'));
  execFileSync('tar',['-xzf',join(root,pack.filename),'--strip-components=1','-C',join(dir,'node_modules/agent-stage')]);
+ if(angular && JSON.parse(readFileSync(join(dir,'package.json'),'utf8')).overrides?.['@angular/cli']?.pacote){
+  execFileSync(process.execPath,[join(repo,'scripts/check-fixture-dependencies.mjs'),dir],{cwd:dir,stdio:'inherit'});
+ }
  if(!browserInstalled){
   execFileSync(join(dir,'node_modules/.bin/playwright'),['install',...(process.env.CI?['--with-deps']:[]),'chromium'],{cwd:dir,stdio:'inherit'});
   browserInstalled=true;

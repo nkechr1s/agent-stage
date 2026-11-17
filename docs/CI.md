@@ -1,6 +1,6 @@
 # CI and maintenance automation
 
-Local syntax/semantic validation uses actionlint; hosted execution still requires the repository owner to push and enable the workflows. The workflows are definitions added to this checkout. Local command verification is documented separately; remote GitHub execution and branch protection cannot be verified until the owner pushes/configures the repository. No status badges imply a passing hosted run.
+Local syntax/semantic validation uses actionlint. Baseline hosted CI/security evidence and the public repository's protection status are recorded in the [final audit](FINAL-RELEASE-AUDIT.md). Subsequent [security-hardening changes](SECURITY-REMEDIATION.md) have been verified locally but not pushed or executed on GitHub. No status badge implies that those uncommitted changes passed hosted CI.
 
 ## Pull requests and main branches
 
@@ -16,7 +16,9 @@ Weekly/manual jobs use locked react18/react19, vue32/vue and angular17 through a
 
 Dependency security runs root npm audit on pushes/PRs and weekly/manual dispatch, failing on high/critical advisories. All dependencies, including development tooling, are included. A SHA-pinned dependency-review action also reviews changes on public-repository PRs; it requires GitHub dependency graph support. Private repositories skip that action unless GitHub Advanced Security is explicitly configured by the owner; root npm audit still runs.
 
-Scheduled/non-PR security runs audit all compatibility locks and upload JSON reports. Historical minimum-version fixtures intentionally retain upstream advisories and are reported rather than silently upgraded or treated as deployment recommendations. New root dependencies must pass review/audit; no automatic dependency upgrades run. Dependabot proposes npm and GitHub Action PRs weekly; merges remain manual and gated by checks. Angular root packages are grouped to preserve version compatibility.
+Every security run also audits all compatibility locks, fails on any Critical finding or unavailable/malformed audit data, and uploads the complete JSON report where available even on failure. Historical High/Moderate/Low findings remain visible for review; they are not exclusions or deployment recommendations. The current [35-advisory disposition](SECURITY-REMEDIATION.md) distinguishes genuinely patched dependencies from restricted-execution mitigations. The Angular 17–19 consumers additionally run dependency API/security probes before their builds to verify deliberate fixture overrides.
+
+New root dependencies must pass review/audit; no automatic dependency upgrades run. Dependabot proposes root npm and GitHub Action PRs weekly; merges remain manual and gated by checks. Angular root packages are grouped. TypeScript and its ESLint tooling are grouped, TypeScript majors require deliberate migration, and npm version updates retain an explicit three-day cooldown. Fixture updates remain manual. The previously failed update's age-filter cause and earliest retry date are documented in the remediation report; hosted repair is not yet verified.
 
 ## Benchmarks and soak
 

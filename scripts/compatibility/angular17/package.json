@@ -17,6 +17,19 @@
     "@types/node": "20.11.30"
   },
   "overrides": {
-    "@types/node": "20.11.30"
+    "@types/node": "20.11.30",
+    "piscina@4": "4.9.4",
+    "postcss@8": "8.5.33",
+    "picomatch@4": "4.0.7",
+    "@angular/cli": {
+      "pacote": "21.5.3"
+    },
+    "copy-webpack-plugin": {
+      "serialize-javascript": "7.1.4"
+    },
+    "external-editor": {
+      "tmp": "0.2.7"
+    },
+    "webpack-dev-middleware": "7.4.6"
   }
 }

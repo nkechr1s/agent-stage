@@ -25,10 +25,9 @@ jobs:
       - run: npm install --global npm@11.13.0
       - run: npm ci --ignore-scripts
       - run: npm audit --audit-level=high
-      - if: github.event_name != 'pull_request'
-        run: node scripts/audit-compatibility.mjs
+      - run: node scripts/audit-compatibility.mjs
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-        if: always() && github.event_name != 'pull_request'
+        if: always()
         with:
           name: compatibility-advisories
           path: artifacts/compatibility-audit.json

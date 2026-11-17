@@ -48,9 +48,11 @@ See [cross-framework APIs](docs/CROSS-FRAMEWORK.md) for `agent-stage/vue` and `a
 
 ## Installation and release status
 
-MIT licensed. Before publication, build and install a local package with `npm pack` and `npm install /absolute/path/agent-stage-0.1.0.tgz` in a consumer. Once published, the package installation command is `npm install agent-stage`. Install only the integration peers you use (`react`, `zustand`, `vue`, or `@angular/core` and its application peers). No framework is required for core use.
+MIT licensed. Before publication, build and install a local package with `npm pack` and `npm install /absolute/path/agent-stage-0.1.0.tgz` in a consumer. The npm name `agent-stage` is already registered; publishing authority and the release namespace must be confirmed before giving a registry installation command for this implementation. Install only the integration peers you use (`react`, `zustand`, `vue`, or `@angular/core` and its application peers). No framework is required for core use.
 
-This is a pre-1.0 candidate. See the [release assessment](PRODUCTION-READINESS.md), [security model](docs/SECURITY.md), [adapter development guide](docs/ADAPTERS.md), and [runtime/SSR limits](docs/RUNTIMES.md). React/Zustand guides are in [INTEGRATIONS](docs/INTEGRATIONS.md); Vue/Angular guides are in [CROSS-FRAMEWORK](docs/CROSS-FRAMEWORK.md). Framework bindings are client-only for the initial release.
+This is a pre-1.0 candidate. The [final release gate audit](docs/FINAL-RELEASE-AUDIT.md) returned **NOT READY**; see its external owner actions and [fixture advisory assessment](docs/FINAL-RELEASE-ADVISORIES.md). See also the [earlier release assessment](PRODUCTION-READINESS.md), [security model](docs/SECURITY.md), [adapter development guide](docs/ADAPTERS.md), and [runtime/SSR limits](docs/RUNTIMES.md). React/Zustand guides are in [INTEGRATIONS](docs/INTEGRATIONS.md); Vue/Angular guides are in [CROSS-FRAMEWORK](docs/CROSS-FRAMEWORK.md). Framework bindings are client-only for the initial release.
+
+The subsequent [security remediation](docs/SECURITY-REMEDIATION.md) removes 21 of the 35 historical High/Critical advisories, including both Critical findings. Fourteen High advisories remain explicitly documented in older frameworks. Root dependencies remain clean; no public peer range or release-readiness decision changed.
 
 Verification from a checkout: `npm test`, `npm run test:security`, `npm run build`, `npm run typecheck`, `npm run check:package`, `npm run benchmark`. `node scripts/check-package-isolation.mjs --install` performs fresh consumer installations. `node scripts/framework-builds.mjs` installs temporary framework apps and runs production builds and headless Chrome checks (network and a Chrome installation required).
 
