@@ -8,7 +8,7 @@ const root=mkdtempSync(join(tmpdir(),'agent-stage-apps-'));const repo=process.cw
 const [pack]=JSON.parse(execFileSync('npm',['pack','--json','--pack-destination',root],{encoding:'utf8'}));
 const results=[];
 let browserInstalled=false;
-for(const framework of (process.argv.slice(2).length ? process.argv.slice(2) : ['vue','vue32','react18','react19','angular17','angular21'])){
+for(const framework of (process.argv.slice(2).length ? process.argv.slice(2) : ['react18','react19','vue','angular20','angular21'])){
  const dir=join(root,framework);mkdirSync(dir);const write=(name,data)=>writeFileSync(join(dir,name),typeof data==='string'?data:JSON.stringify(data,null,2));
  const react=framework.startsWith('react');const angular=framework.startsWith('angular');
  const fixture=join(repo,'scripts/compatibility',framework);
@@ -17,10 +17,11 @@ for(const framework of (process.argv.slice(2).length ? process.argv.slice(2) : [
  copyFileSync(join(fixture,'package-lock.json'),join(dir,'package-lock.json'));
  console.log('Installing locked consumer',framework,dir);
  execFileSync('npm',['ci','--ignore-scripts','--no-audit','--fetch-retries=0','--fetch-timeout=30000'],{cwd:dir,stdio:'inherit'});
- mkdirSync(join(dir,'node_modules/agent-stage'));
- execFileSync('tar',['-xzf',join(root,pack.filename),'--strip-components=1','-C',join(dir,'node_modules/agent-stage')]);
- if(angular && JSON.parse(readFileSync(join(dir,'package.json'),'utf8')).overrides?.['@angular/cli']?.pacote){
-  execFileSync(process.execPath,[join(repo,'scripts/check-fixture-dependencies.mjs'),dir],{cwd:dir,stdio:'inherit'});
+ execFileSync('npm',['install','--ignore-scripts','--strict-peer-deps','--no-save','--no-audit',join(root,pack.filename)],{cwd:dir,stdio:'inherit'});
+ const locked=JSON.parse(readFileSync(join(fixture,'package-lock.json'),'utf8')).packages;
+ for(const [path,entry] of Object.entries(locked)){
+  const installed=join(dir,path,'package.json');
+  if(path && existsSync(installed) && JSON.parse(readFileSync(installed,'utf8')).version!==entry.version)throw Error(`Locked dependency drift: ${framework}/${path}`);
  }
  if(!browserInstalled){
   execFileSync(join(dir,'node_modules/.bin/playwright'),['install',...(process.env.CI?['--with-deps']:[]),'chromium'],{cwd:dir,stdio:'inherit'});

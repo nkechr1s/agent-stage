@@ -1,6 +1,6 @@
 # Security model
 
-Compatibility-toolchain findings and their current disposition are tracked in [security remediation](SECURITY-REMEDIATION.md). The development root is clean, fixtures have no known Critical findings, and residual historical-framework High advisories remain documented separately from the runtime guarantees below.
+Compatibility-toolchain findings and their current disposition are tracked in [security remediation](SECURITY-REMEDIATION.md). Supported fixtures are gated against High and Critical findings. Vulnerable historical fixture trees have been retired under the [support policy](SUPPORT-POLICY.md); their unresolved advisories remain historical evidence, not fixes.
 
 The untrusted input boundary is parsed JSON state and JSON Patch operations. Adapters, selectors, update/validation callbacks, subscriptions, and application code are trusted JavaScript. This library does not sandbox functions, getters supplied outside validated JSON, hostile Proxies, middleware, or an already-compromised JavaScript realm.
 

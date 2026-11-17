@@ -1,5 +1,7 @@
 # Final release gate audit
 
+Historical evidence: the owner-approved [support policy](SUPPORT-POLICY.md) now supersedes earlier support ranges and executable matrices. Angular 17–19 and Vue 3.2 are unsupported; their lockfiles and runnable fixtures have been retired. The advisory history below is preserved, not relabeled as fixed.
+
 Audit date: **2026-11-17**. Decision: **NOT READY**.
 
 Follow-up: [security remediation](SECURITY-REMEDIATION.md) subsequently removed 21 of the 35 historical High/Critical findings, including both Critical advisories. Its current counts and dependency changes supersede the fixture inventory below. This document retains the original audit evidence and external release blockers.

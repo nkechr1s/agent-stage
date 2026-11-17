@@ -1,9 +1,10 @@
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
-import { mkdtempSync, readFileSync, mkdirSync, writeFileSync, existsSync } from 'node:fs';
+import { mkdtempSync, readFileSync, mkdirSync, writeFileSync, existsSync, readdirSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+assert.deepEqual(readdirSync('scripts/compatibility',{withFileTypes:true}).filter(item=>item.isDirectory()).map(item=>item.name).sort(),['angular20','angular21','react18','react19','vue']);
 const root=mkdtempSync(join(tmpdir(),'agent-stage-integrity-'));
 const pack=()=>JSON.parse(execFileSync('npm',['pack','--json','--pack-destination',root,'--cache',join(root,'cache')],{encoding:'utf8'}))[0];
 mkdirSync('dist',{recursive:true});writeFileSync('dist/__stale-audit-marker.js','throw Error("stale build");');
@@ -15,6 +16,9 @@ for(const path of files)assert(/^(dist\/|src\/|docs\/|benchmarks\/[^/]+\.json$|R
 for(const path of files)assert(!/(^|\/)(node_modules|\.husky|\.git|\.github|tests|scripts)(\/|$)|(^|\/)\.env(\.|$)|(^|\/)\.npmrc$|\.(pem|key)$/.test(path),`Forbidden package content: ${path}`);
 const unpack=join(root,'unpacked');mkdirSync(unpack);execFileSync('tar',['-xzf',join(root,second.filename),'-C',unpack]);
 const metadata=JSON.parse(readFileSync(join(unpack,'package/package.json'),'utf8'));
+assert.deepEqual(metadata.peerDependencies, {'@angular/core':'>=20 <22',react:'>=18 <20',vue:'>=3.5 <4',zustand:'>=5 <6'});
+assert.equal(metadata.engines.node,'>=22.22.1 <23 || >=24.22.3 <25');
+assert.equal(metadata.name,'agent-stage');
 assert.equal(metadata.license,'MIT');assert.equal(Object.keys(metadata.dependencies||{}).length,0);assert.equal(Object.keys(metadata.exports).length,5);
 for(const peer of Object.keys(metadata.peerDependencies))assert.equal(metadata.peerDependenciesMeta[peer].optional,true);
 for(const entry of Object.values(metadata.exports)){assert(files.has(entry.import.slice(2)));assert(files.has(entry.types.slice(2)));}

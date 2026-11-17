@@ -1,5 +1,7 @@
 # First public release assessment
 
+Historical assessment: current support is governed by [the owner-approved policy](docs/SUPPORT-POLICY.md). Angular 17–19 and Vue 3.2 fixtures are retired; earlier audit results below do not describe current security status or support.
+
 Historical audit baseline: bounded-history and workload blockers below were subsequently addressed with finite defaults and admission controls. See [beta hardening verification](docs/BETA-HARDENING-VERIFICATION.md) for current behavior and measurements. This historical report does not establish a later production-release certification. The later [public API hardening](docs/PUBLIC-API-HARDENING.md) adds terminal indeterminate results and recursively readonly views, superseding the old locked-committing/shallow-readonly discussion below.
 
 Date: 2026-11-16. Outcome: **READY FOR PUBLIC BETA** within the documented client/runtime, JSON, workload and adapter contracts. **Not ready for a general production-release claim.** No package was published, pushed or committed.

@@ -1,6 +1,6 @@
 import ts from 'typescript';
 import assert from 'node:assert/strict';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import { mkdtempSync, mkdirSync, readFileSync, writeFileSync, symlinkSync, existsSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
@@ -91,3 +91,19 @@ function publicReadonlyChecks(snapshot: import('agent-stage').Snapshot, typed: i
   console.log(`${example.entry}: isolated packed import, strict declarations, runtime and dependency graph passed`);
 }
 console.log(`Local verification artifacts: ${temporary}`);
+
+if (process.argv.includes('--install')) {
+  for (const [peer, version] of [['vue', '3.2.47'], ['@angular/core', '17.3.12'], ['@angular/core', '18.2.14'], ['@angular/core', '19.2.25']]) {
+    const consumer = join(temporary, `unsupported-${peer.replaceAll('/', '-')}-${version}`);
+    mkdirSync(consumer);
+    writeFileSync(join(consumer, 'package.json'), JSON.stringify({ private: true, dependencies: { 'agent-stage': 'file:' + join(temporary, pack.filename), [peer]: version } }));
+    // Resolve metadata only: rejected legacy versions must never be installed or executed.
+    const result = spawnSync('npm', ['install', '--package-lock-only', '--ignore-scripts', '--strict-peer-deps', '--no-audit', '--fetch-retries=0'], { cwd: consumer, encoding: 'utf8' });
+    assert.notEqual(result.status, 0, `${peer}@${version} must be rejected`);
+    assert.match(result.stderr, /ERESOLVE/);
+    assert.match(result.stderr, /peerOptional/);
+    assert.match(result.stderr, /agent-stage/);
+    assert(!existsSync(join(consumer, 'node_modules')), 'Legacy rejection must not install packages');
+    console.log(`Rejected unsupported optional peer ${peer}@${version}: ERESOLVE`);
+  }
+}

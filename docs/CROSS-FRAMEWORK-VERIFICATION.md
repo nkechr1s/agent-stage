@@ -1,5 +1,7 @@
 # Cross-framework verification
 
+Historical evidence: the owner-approved [support policy](SUPPORT-POLICY.md) now supersedes earlier support ranges and executable matrices. Angular 17–19 and Vue 3.2 are unsupported; their lockfiles and runnable fixtures have been retired. The advisory history below is preserved, not relabeled as fixed.
+
 Executed on Node 22.22.1 with TypeScript 5.9.3. Final development peers: Vue 3.5.45 and Angular Core 21.2.26.
 
 ## Results actually executed

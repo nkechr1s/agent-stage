@@ -2,7 +2,7 @@
 
 The package is ESM-only. It requires native structuredClone, BigInt, WeakMap, Object.hasOwn and modern ES2022 support. Node 22.22.1 and 24.22.3 on macOS arm64 were exercised. The declared range is now >=22.22.1 <23 || >=24.22.3 <25, with those exact floors pinned in CI. This intentionally narrows the old unbounded >=22 declaration instead of implicitly promising future majors. The full core/unit/security suite, builds, declarations and package imports were run on both floors. Patch releases above those floors in the two named majors are compatibility intent; only the pinned matrix points are actual executed evidence. Other Node majors, operating systems, browsers and edge runtimes are not certified by that statement.
 
-Framework peers remain optional and isolated: React >=18 <20; Zustand >=5 <6; Vue >=3.2 <4; Angular Core >=17 <22. Exact tested versions and compiler/browser evidence are in the release report. Historical Angular 17 and Vue 3.2 compatibility does not endorse deploying upstream packages with known advisories. Prefer maintained patched peers.
+Framework peers remain optional and isolated: React >=18 <20; Zustand >=5 <6; Vue >=3.5 <4; Angular Core >=20 <22. Exact tested versions and compiler/browser evidence are in the release report. Angular 17–19 and Vue 3.2 are unsupported and their executable fixtures have been retired due to unresolved upstream advisories. See [support policy](SUPPORT-POLICY.md) for exact verified points.
 
 ## SSR and hydration decision
 

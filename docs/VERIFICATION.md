@@ -1,5 +1,7 @@
 # Verification
 
+Historical evidence: the owner-approved [support policy](SUPPORT-POLICY.md) now supersedes earlier support ranges and executable matrices. Angular 17–19 and Vue 3.2 are unsupported; their lockfiles and runnable fixtures have been retired. The advisory history below is preserved, not relabeled as fixed.
+
 Current CI/developer tooling command and compatibility evidence: [Developer tooling verification](DEVELOPER-TOOLING-VERIFICATION.md). This does not assign a release-readiness status.
 
 Latest public API contract checks and 155-test result: [Public API hardening verification](PUBLIC-API-HARDENING-VERIFICATION.md).

@@ -1,5 +1,7 @@
 # First integration phase verification
 
+Historical evidence: the owner-approved [support policy](SUPPORT-POLICY.md) now supersedes earlier support ranges and executable matrices. Angular 17–19 and Vue 3.2 are unsupported; their lockfiles and runnable fixtures have been retired. The advisory history below is preserved, not relabeled as fixed.
+
 Executed on Node 22.22.1. Final development dependencies use React/React DOM 18.3.1 and Zustand 5.1.0.
 
 ## Actual checks

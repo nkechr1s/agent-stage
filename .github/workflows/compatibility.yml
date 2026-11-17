@@ -14,7 +14,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        framework: [react18, react19, vue32, vue, angular17, angular18, angular19, angular20, angular21]
+        framework: [react18, react19, vue, angular20, angular21]
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:

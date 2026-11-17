@@ -5,8 +5,8 @@
 | `agent-stage` | Transactional core | None |
 | `agent-stage/react` | React hooks | React >=18 <20 |
 | `agent-stage/zustand` | JSON slice adapter | Zustand >=5 <6 |
-| `agent-stage/vue` | Vue composables | Vue >=3.2 <4 |
-| `agent-stage/angular` | Angular signal helpers | @angular/core >=17 <22 |
+| `agent-stage/vue` | Vue composables | Vue >=3.5 <4 |
+| `agent-stage/angular` | Angular signal helpers | @angular/core >=20 <22 |
 
 All exports have ESM JavaScript and matching public declarations. Each frontend integration depends only on its own peer and internal framework-free utilities/types. The core has no framework imports. No Vanilla entry point is needed.
 
@@ -98,7 +98,7 @@ npm run example:vanilla
 
 ## Version verification and limits
 
-Tests ran against Vue 3.2.47 and 3.5.45, and Angular Core 17.3.12 and 21.2.26. These are endpoint checks, not every minor/major combination in the declared ranges. Angular 17 and Vue 3.2 are compatibility checks; their old upstream packages reported advisories during installation. The final lockfile uses Vue 3.5.45 and Angular 21.2.26, whose install audit reported zero vulnerabilities. Use maintained framework releases for application deployments.
+Verified points are Vue 3.5.45 and Angular 20.3.35/21.2.26. Angular 17–19 and Vue 3.2 are unsupported following legacy fixture retirement. Exact tested versions do not certify every future minor release; see [support policy](SUPPORT-POLICY.md).
 
 Angular CLI/AOT compilation across historical versions and SSR/hydration have not been tested. The integration ships ordinary ESM functions rather than Angular-decorated classes; use normal NodeNext/Bundler package resolution in the host build. Future Angular major versions require new verification before widening the range.
 

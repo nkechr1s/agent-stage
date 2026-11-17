@@ -1,5 +1,7 @@
 # Final release gate: historical fixture security assessment
 
+Historical evidence: the owner-approved [support policy](SUPPORT-POLICY.md) now supersedes earlier support ranges and executable matrices. Angular 17–19 and Vue 3.2 are unsupported; their lockfiles and runnable fixtures have been retired. The advisory history below is preserved, not relabeled as fixed.
+
 This is the original baseline inventory. The subsequent [remediation report](SECURITY-REMEDIATION.md) accounts for all 35 findings, with 21 fully removed and no Critical findings remaining. Use that report for current versions and execution boundaries; baseline dependency paths below are preserved for comparison.
 
 Audit date: 2026-11-17. Subject commit: `71ec1b51af4426f322d73a1ae6a6e519f0d7470a`.
